@@ -1,0 +1,2 @@
+#!/bin/bash
+cp -r "$1" "$HOME/backup/$(basename $1)-$(date '+%F-%T')"
