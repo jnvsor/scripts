@@ -7,7 +7,7 @@ fi
 rm -rf "$HOME/localhost/$1"
 sudo a2dissite "$1"
 sudo rm "/etc/apache2/sites-available/$1.conf"
-sed -r "/^[^#]+$1\.local\$/d" "/etc/hosts" | sudo tee "/etc/hosts" 1>/dev/null
+sed -r '/^[^#]+'"$1"'\.local$/d' "/etc/hosts" | sudo tee "/etc/hosts" 1>/dev/null
 sudo systemctl reload apache2
 mysql -uroot -e "DROP DATABASE \`$1\`"
 mysql -uroot -e "DROP USER '$1'@'localhost'"
