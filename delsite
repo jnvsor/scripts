@@ -1,4 +1,9 @@
 #!/bin/bash
+if [[ "$1" != "$(basename "$1")" || "." = "$1" || ".." = "$1" || ! -d "$HOME/localhost/$1" ]]; then
+    >&2 echo "No site offered, aborting"
+    exit 1
+fi
+
 rm -rf "$HOME/localhost/$1"
 sudo a2dissite "$1"
 sudo rm "/etc/apache2/sites-available/$1.conf"
