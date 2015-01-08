@@ -1,0 +1,15 @@
+#!/bin/bash
+if [[ -d "$HOME/localhost/$1" ]]; then
+    >&2 echo "'$HOME/localhost/$1' already exists, aborting."
+    exit 1
+fi
+
+mkdir "$HOME/localhost/$1"
+cd "/etc/apache2/sites-available"
+sed -r '
+    s:(^|\s+)DocumentRoot /home/j/localhost$:&/'"$1"':
+    s:(^|\s+)#ServerName.+$:\1ServerName '"$1"'.local:' '000-default.conf' | sudo tee "$1.conf" 1>/dev/null
+sudo a2ensite "$1"
+echo -e "127.0.0.1\\t$1.local" | sudo tee -a "/etc/hosts" 1>/dev/null
+sudo systemctl reload apache2
+echo "$1 created"

@@ -1,0 +1,7 @@
+#!/bin/bash
+rm -rf "$HOME/localhost/$1"
+sudo a2dissite "$1"
+sudo rm "/etc/apache2/sites-available/$1.conf"
+sed -r "/^[^#]+$1\.local\$/d" "/etc/hosts" | sudo tee "/etc/hosts" 1>/dev/null
+sudo systemctl reload apache2
+echo "$1 deleted"
