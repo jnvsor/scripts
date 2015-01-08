@@ -1,4 +1,6 @@
 #!/bin/bash
+mysql_use_pw=false
+
 if [[ -d "$HOME/localhost/$1" ]]; then
     >&2 echo "'$HOME/localhost/$1' already exists, aborting."
     exit 1
@@ -12,4 +14,18 @@ sed -r '
 sudo a2ensite "$1"
 echo -e "127.0.0.1\\t$1.local" | sudo tee -a "/etc/hosts" 1>/dev/null
 sudo systemctl reload apache2
+
+if [[ "$mysql_use_pw" = "true" ]]; then
+    mysqlpw="$(apg -a1 -E "'" -n 1 -m 15 -x 15)"
+    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$1\`"
+    mysql -uroot -e "GRANT ALL ON \`$1\`.* TO '$1'@'localhost' IDENTIFIED BY '$mysqlpw'"
+else
+    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$1\`"
+    mysql -uroot -e "GRANT ALL ON \`$1\`.* TO '$1'@'localhost'"
+fi
+
 echo "$1 created"
+
+if [[ -v mysqlpw ]]; then
+    echo "mysql password is: $mysqlpw"
+fi
