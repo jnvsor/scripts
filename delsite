@@ -6,7 +6,7 @@ if [[
     ".." = "$1" ||
     ! -d "$HOME/localhost/$1"
 ]]; then
-    >&2 echo "No site offered, aborting"
+    >&2 echo "Invalid site '$1' offered, aborting"
     exit 1
 fi
 
