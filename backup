@@ -1,3 +1,17 @@
 #!/bin/bash
-mkdir -p "$HOME/backup/$(basename $1)"
-tar --force-local -czf "$HOME/backup/$(basename $1)/$(basename $1)-$(date '+%F-%T').tar.gz" "$1"
+if [[ "$#" -eq 2 ]]; then
+    target="$(basename "$2")"
+elif [[ "$#" -eq 1 ]]; then
+    target="$(basename "$1")"
+else
+    echo "Syntax: backup source [target]"
+    exit 1
+fi
+
+if [[ ! -e "$1" ]]; then
+    echo "Error: File not found"
+    exit 1
+fi
+
+mkdir -p "$HOME/backup/$target"
+tar --force-local -czf "$HOME/backup/$target/$target-$(date '+%F-%T').tar.gz" "$1"
