@@ -1,0 +1,11 @@
+#!/bin/bash
+proc=( $( top -b -n 1 -u $( id -u ) | grep vlc | sed 's/^ *//' | tr -s ' ' | cut -d ' ' -f 1,9 ) )
+
+i=0
+while [ $i -lt ${#proc[@]} ]; do
+  if [ $( echo "${proc[$(( $i + 1 ))]} > 30.0" | bc ) -eq 1 ]
+  then
+    kill -9 "${proc[$i]}"
+  fi
+  i=$(( $i + 2 ));
+done
