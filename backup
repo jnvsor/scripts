@@ -1,8 +1,8 @@
 #!/bin/bash
 if [[ "$#" -eq 2 ]]; then
-    target="$(basename "$2")"
+    target="$(basename "$(realpath "$2")")"
 elif [[ "$#" -eq 1 ]]; then
-    target="$(basename "$1")"
+    target="$(basename "$(realpath "$1")")"
 else
     echo "Syntax: backup source [target]"
     exit 1
