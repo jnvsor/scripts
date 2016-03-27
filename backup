@@ -1,4 +1,7 @@
 #!/bin/bash
+# backup
+# Sends tarballs the target inside the ~/backup dir
+
 if [[ "$#" -eq 2 ]]; then
     target="$(basename "$(realpath "$2")")"
 elif [[ "$#" -eq 1 ]]; then

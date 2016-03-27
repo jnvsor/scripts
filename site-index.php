@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<!---
+Localhost index to list sites created with addsite and delsite
+-->
     <head>
         <title>Local Site Index</title>
     </head>

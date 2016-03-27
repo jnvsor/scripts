@@ -1,4 +1,8 @@
 #!/bin/bash
+# Addsite
+# For use with a lamp stack
+# creates a new siteconf, root directory, mysql database/user, hosts entry
+
 case "$1" in
     -p|--password)
         mysqlpw="$2"

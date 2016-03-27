@@ -1,4 +1,7 @@
 #!/bin/bash
+# distanceLevels
+# Copies distance levels from workshop to my levels so you can open them in the level editor
+
 cd ~/.config/refract/Distance/Levels/WorkshopLevels &&
 rm -rf ../MyLevels/* &&
 cp --backup=t */* ../MyLevels/ &&

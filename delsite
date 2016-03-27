@@ -1,4 +1,7 @@
 #!/bin/bash
+# Delsite
+# For use with a lamp stack - deletes a site created with addsite
+
 if [[
     -z "$1" ||
     "$1" != "$(basename "$1")" ||
