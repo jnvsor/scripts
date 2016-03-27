@@ -1,0 +1,8 @@
+#!/bin/bash
+# Pauses xscreensaver by deactivating it every 30 seconds
+
+while :
+do
+xscreensaver-command -deactivate
+sleep 30s
+done
