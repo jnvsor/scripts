@@ -1,0 +1,15 @@
+#!/bin/bash
+# Gets external IPs
+# Add argument 4 for ipv4 only, or 6 for ipv6 only
+#
+# Be considerate and don't flood the guy's server:
+# > [...]rate limit of 30 requests/minute[...]
+
+endpoint="http://myexternalip.com/raw";
+ipv="4";
+
+if [ "$1" == "6" ]; then
+    ipv="6"
+fi
+
+curl -sS$ipv "$endpoint"
