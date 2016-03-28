@@ -1,10 +1,34 @@
-#!/bin/bash
+#!/bin/bash -e
 # distanceLevels
-# Copies distance levels from workshop to my levels so you can open them in the level editor
+# Copies distance levels from workshop to my levels so you can open them in the
+# level editor
+#
+# Depends on distance_map_parse to rename files to their track names
+#
+# WARNING: This script starts off by emptying your MyLevels folder. If you are
+# creating your own tracks, back them up before running.
 
-cd ~/.config/refract/Distance/Levels/WorkshopLevels &&
-rm -rf ../MyLevels/* &&
-cp --backup=t */* ../MyLevels/ &&
+cd ~/.config/refract/Distance/Levels/WorkshopLevels
+rm -rf ../MyLevels/*
+
+if [ hash distance_map_parse 2>/dev/null ]; then
+    cp --backup=t */* ../MyLevels/
+else
+    for file in */*.bytes
+    do
+        while read i
+        do
+            if [ "$(echo "$i" | cut -f1)" == "Title" ]; then
+                newfilename="$(echo "$i" | cut -f 2- | sed -e 's%[/:]%_%g').bytes"
+                cp --backup=t "$file" "../MyLevels/$newfilename"
+                cp --backup=t "$file.png" "../MyLevels/$newfilename.png"
+                break
+            fi
+        done <<< "$(distance_map_parse "$file")"
+    done
+fi
+
 rename 's/(\.bytes(\.png)?)\.~([0-9]+)~/.$3$1/' ../MyLevels/*
+
 echo -n "Found maps: "
 ls ../MyLevels/*.bytes | wc -l
