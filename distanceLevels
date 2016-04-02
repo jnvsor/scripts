@@ -32,3 +32,5 @@ rename 's/(\.bytes(\.png)?)\.~([0-9]+)~/.$3$1/' ../MyLevels/*
 
 echo -n "Found maps: "
 ls ../MyLevels/*.bytes | wc -l
+
+cp ../MyLevels.bak/*.bytes ../MyLevels.bak/*.bytes.png ../MyLevels/
