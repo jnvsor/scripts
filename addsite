@@ -27,7 +27,7 @@ if [[
 fi
 
 if [[ -d "$sitepath" || -f "$apachepath/$sitename.conf" ]]; then
-    >&2 echo "'$sitepath' already exists, aborting."
+    >&2 echo "Site '$sitename' already exists, aborting."
     exit 1
 fi
 
@@ -38,7 +38,7 @@ sed -r '
     s:(^|\s+)DocumentRoot '"$sitespath"'$:&/'"$sitename"':
     s:(^|\s+)#ServerName.+$:\1ServerName '"$sitename"'.local:' "$apacheskel" | sudo tee "$sitename.conf" 1>/dev/null
 sudo a2ensite "$sitename"
-echo -e "127.0.0.1\\t$sitename.local" | sudo tee -a "$(realpath "/etc/hosts")" 1>/dev/null
+echo -e "127.0.0.1\\t$sitename.local" | sudo tee -a "/etc/hosts" 1>/dev/null
 sudo systemctl reload apache2
 
 if [[ -n "$mysqlpw" ]]; then

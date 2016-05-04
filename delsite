@@ -11,7 +11,7 @@ sitepath="$sitespath/$sitename"
 if [[
     -z "$sitename" || # If it's empty
     "$sitename" != "$(basename "$sitename")" || # If it's a subfolder
-    "$(dirname "$(realpath "$sitepath")")" != "$sitespath" || # If it's not under localhost (. .. etc)
+    "$(dirname "$(realpath -s "$sitepath")")" != "$sitespath" || # If it's not under localhost (. .. etc)
     ! -d "$sitepath" || # If the folder doesn't exist
     ! -f "$apachepath/$sitename.conf" # If the apache config doesn't exist
 ]]; then
