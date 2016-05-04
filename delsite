@@ -1,23 +1,30 @@
-#!/bin/bash
+#!/bin/bash -e
 # Delsite
 # For use with a lamp stack - deletes a site created with addsite
 
+sitespath="$HOME/localhost"
+apachepath="/etc/apache2/sites-available"
+
+sitename="$1"
+sitepath="$sitespath/$sitename"
+
 if [[
-    -z "$1" ||
-    "$1" != "$(basename "$1")" ||
-    "." = "$1" ||
-    ".." = "$1" ||
-    ! -d "$HOME/localhost/$1"
+    -z "$sitename" || # If it's empty
+    "$sitename" != "$(basename "$sitename")" || # If it's a subfolder
+    "$(dirname "$(realpath "$sitepath")")" != "$sitespath" || # If it's not under localhost (. .. etc)
+    ! -d "$sitepath" || # If the folder doesn't exist
+    ! -f "$apachepath/$sitename.conf" # If the apache config doesn't exist
 ]]; then
-    >&2 echo "Invalid site '$1' offered, aborting"
+    >&2 echo "Invalid site '$sitename' offered, aborting"
     exit 1
 fi
 
-rm -rf "$HOME/localhost/$1"
-sudo a2dissite "$1"
-sudo rm "/etc/apache2/sites-available/$1.conf"
-sed -r '/^[^#]+'"$1"'\.local$/d' "/etc/hosts" | sudo tee "/etc/hosts" 1>/dev/null
+sudo rm -rf "$sitepath"
+sudo a2dissite "$sitename"
+sudo rm "$apachepath/$sitename.conf"
+sudo sed --follow-symlinks -i -r '/^[^#]+'"$sitename"'\.local$/d' "/etc/hosts"
 sudo systemctl reload apache2
-mysql -uroot -e "DROP DATABASE \`$1\`"
-mysql -uroot -e "DROP USER '$1'@'localhost'"
-echo "$1 deleted"
+mysql -uroot -e "DROP DATABASE IF EXISTS \`$sitename\`"
+mysql -uroot -e "GRANT USAGE ON *.* TO '$sitename'@'localhost'"
+mysql -uroot -e "DROP USER '$sitename'@'localhost'"
+echo "$sitename deleted"

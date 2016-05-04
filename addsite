@@ -1,7 +1,12 @@
-#!/bin/bash
+#!/bin/bash -e
 # Addsite
 # For use with a lamp stack
 # creates a new siteconf, root directory, mysql database/user, hosts entry
+
+sitespath="$HOME/localhost"
+apacheuser="www-data"
+apachepath="/etc/apache2/sites-available"
+apacheskel="000-default.conf"
 
 case "$1" in
     -p|--password)
@@ -9,37 +14,39 @@ case "$1" in
         shift 2
 esac
 
+sitename="$1"
+sitepath="$sitespath/$sitename"
+
 if [[
-    -z "$1" ||
-    "$1" != "$(basename "$1")" ||
-    "." = "$1" ||
-    ".." = "$1"
+    -z "$sitename" || # If it's empty
+    "$sitename" != "$(basename "$sitename")" || # If it's a subfolder
+    "$(dirname "$(realpath "$sitepath")")" != "$sitespath" # If it's not under localhost (. .. etc)
 ]]; then
-    >&2 echo "Invalid site '$1' offered, aborting"
+    >&2 echo "Invalid site '$sitename' offered, aborting"
     exit 1
 fi
 
-if [[ -d "$HOME/localhost/$1" ]]; then
-    >&2 echo "'$HOME/localhost/$1' already exists, aborting."
+if [[ -d "$sitepath" || -f "$apachepath/$sitename.conf" ]]; then
+    >&2 echo "'$sitepath' already exists, aborting."
     exit 1
 fi
 
-mkdir "$HOME/localhost/$1"
-sudo chgrp "www-data" "$HOME/localhost/$1"
-cd "/etc/apache2/sites-available"
+mkdir "$sitepath"
+sudo chgrp "$apacheuser" "$sitepath"
+cd "$apachepath"
 sed -r '
-    s:(^|\s+)DocumentRoot /home/j/localhost$:&/'"$1"':
-    s:(^|\s+)#ServerName.+$:\1ServerName '"$1"'.local:' '000-default.conf' | sudo tee "$1.conf" 1>/dev/null
-sudo a2ensite "$1"
-echo -e "127.0.0.1\\t$1.local" | sudo tee -a "/etc/hosts" 1>/dev/null
+    s:(^|\s+)DocumentRoot '"$sitespath"'$:&/'"$sitename"':
+    s:(^|\s+)#ServerName.+$:\1ServerName '"$sitename"'.local:' "$apacheskel" | sudo tee "$sitename.conf" 1>/dev/null
+sudo a2ensite "$sitename"
+echo -e "127.0.0.1\\t$sitename.local" | sudo tee -a "$(realpath "/etc/hosts")" 1>/dev/null
 sudo systemctl reload apache2
 
 if [[ -n "$mysqlpw" ]]; then
-    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$1\`"
-    mysql -uroot -e "GRANT ALL ON \`$1\`.* TO '$1'@'localhost' IDENTIFIED BY '$mysqlpw'"
+    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$sitename\`"
+    mysql -uroot -e "GRANT ALL ON \`$sitename\`.* TO '$sitename'@'localhost' IDENTIFIED BY '$mysqlpw'"
 else
-    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$1\`"
-    mysql -uroot -e "GRANT ALL ON \`$1\`.* TO '$1'@'localhost'"
+    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$sitename\`"
+    mysql -uroot -e "GRANT ALL ON \`$sitename\`.* TO '$sitename'@'localhost'"
 fi
 
-echo "$1 created"
+echo "$sitename created"
