@@ -1,0 +1,32 @@
+#!/bin/bash
+
+errors=0
+
+function test {
+    output=$( ./wchar "$2" )
+    if [[ "$output" != "$3" ]]
+    then
+        echo "Error in $1 test, got:"
+        echo "$output"
+        let errors++
+    fi
+}
+
+test "basic" 'test' "{'t','e','s','t',0}"
+test "escaping" 'escape\n' "{'e','s','c','a','p','e','\n',0}"
+test "octal" 'e_oct\123' "{'e','_','o','c','t','\123',0}"
+test "octal overflow" 'e_oct_overflow\123456' "{'e','_','o','c','t','_','o','v','e','r','f','l','o','w','\123','4','5','6',0}"
+test "octal bounds" 'e_oct_bounds\678' "{'e','_','o','c','t','_','b','o','u','n','d','s','\67','8',0}"
+test "reverse octal bounds" 'e_oct_bounds_rev\876' "{'e','_','o','c','t','_','b','o','u','n','d','s','_','r','e','v','\8','7','6',0}"
+test "hex" 'e_hex_\x123467890abcdefABCDEFg123' "{'e','_','h','e','x','_','\x123467890abcdefABCDEF','g','1','2','3',0}"
+test "newline" 'newline
+test' "{'n','e','w','l','i','n','e','\n','t','e','s','t',0}"
+test "newline escaping" 'newline\
+escape' "{'n','e','w','l','i','n','e','e','s','c','a','p','e',0}"
+test "newline trailing" 'newline-trail
+' "{'n','e','w','l','i','n','e','-','t','r','a','i','l','\n',0}"
+# This test result is wierd because I had to wrap it in double quotes. Just
+# pretend there are half the amount of backslashes
+test "single quote" "' \\' \\\\' "\' "{'\\'',' ','\\'',' ','\\\\','\\'',' ','\\'',0}"
+
+exit $errors
