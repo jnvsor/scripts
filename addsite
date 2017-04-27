@@ -8,6 +8,7 @@ apacheuser="www-data"
 apachepath="/etc/apache2/sites-available"
 apacheskel="000-default.conf"
 
+mysqlpw=""
 case "$1" in
     -p|--password)
         mysqlpw="$2"
@@ -41,12 +42,8 @@ sudo a2ensite "$sitename"
 echo -e "127.0.0.1\\t$sitename.local" | sudo tee -a "/etc/hosts" 1>/dev/null
 sudo systemctl reload apache2
 
-if [[ -n "$mysqlpw" ]]; then
-    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$sitename\`"
-    mysql -uroot -e "GRANT ALL ON \`$sitename\`.* TO '$sitename'@'localhost' IDENTIFIED BY '$mysqlpw'"
-else
-    mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$sitename\`"
-    mysql -uroot -e "GRANT ALL ON \`$sitename\`.* TO '$sitename'@'localhost'"
-fi
+mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$sitename\`"
+mysql -uroot -e "CREATE USER 'silextest'@'localhost' IDENTIFIED BY '$mysqlpw'";
+mysql -uroot -e "GRANT ALL ON \`$sitename\`.* TO '$sitename'@'localhost'"
 
 echo "$sitename created"
