@@ -43,7 +43,7 @@ echo -e "127.0.0.1\\t$sitename.local" | sudo tee -a "/etc/hosts" 1>/dev/null
 sudo systemctl reload apache2
 
 mysql -uroot -e "CREATE DATABASE IF NOT EXISTS \`$sitename\`"
-mysql -uroot -e "CREATE USER 'silextest'@'localhost' IDENTIFIED BY '$mysqlpw'";
+mysql -uroot -e "CREATE USER '$sitename'@'localhost' IDENTIFIED BY '$mysqlpw'";
 mysql -uroot -e "GRANT ALL ON \`$sitename\`.* TO '$sitename'@'localhost'"
 
 echo "$sitename created"
